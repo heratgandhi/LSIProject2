@@ -10,11 +10,10 @@ public class OutDegree {
 			long counter = 0;
 			long node = 0;
 			String[] parts;
-			long s,d;
+			long s;
 			while ( (line=br.readLine()) != null ) {
 				parts = line.split(" ");
 				s = Long.parseLong(parts[0]);
-				d = Long.parseLong(parts[1]);
 				if(s == node) {
 					counter ++;
 				} else {
