@@ -1,7 +1,4 @@
 import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -22,7 +19,11 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		
 		String list_v = "";
 		for(int i=0;i<deg;i++) {
-			list_v += parts[3+i];
+			if(list_v == "") {
+				list_v += parts[3+i];
+			} else {
+				list_v += " " + parts[3+i];
+			}			
 			context.write(new Text(parts[3+i]), new Text(division));
 		}
 		context.write(new Text(source), new Text(list_v));
