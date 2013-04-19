@@ -17,11 +17,18 @@ public class CreateInputFile {
 			
 			double counter = 1;
 			String line = "";
+			String lno = "";
+			String rno = "";
 			while((line = br.readLine())!=null) {
 				
-				counter = Double.parseDouble(line.substring(line.lastIndexOf(' ')));
+				counter = Double.parseDouble(line.substring(line.lastIndexOf(" ")));
 				if(selectInputLine(counter, rejectMin, rejectLimit)) {
-					bw.write(line+"\n");
+					line = line.substring(0,line.lastIndexOf(" "));
+					lno = line.substring(0,6);
+					rno = line.substring(7);
+					lno = lno.trim();
+					rno = rno.trim();
+					bw.write(lno+" "+rno+"\n");
 				}
 				
 			}
