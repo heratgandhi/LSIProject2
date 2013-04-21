@@ -27,7 +27,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		}
 		rank = ((0.15)/PageRank.nodes) + (0.85 * sum); 
 		residue = Math.abs(rank - prank) / rank;
-		residue *= 10000; //To map residual to the long rank
+		residue *= PageRank.multiplication_factor; //To map residual to the long rank
 		context.getCounter(ResidualCounter.RESIDUE).increment((long)residue);
 		context.write(key, new Text(sum+" "+deg+" "+list));
 	}
