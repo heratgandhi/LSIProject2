@@ -23,13 +23,13 @@ public class MainInputFile {
 						dest += d;
 					counter ++;
 				} else {
-					bw.write(node+" 1 "+counter+" "+dest+"\n");
+					bw.write(node+"\t1 "+counter+" "+dest+"\n");
 					dest = d+"";
 					node++;
 					counter = 1;
 				}
 			}
-			bw.write(node+" 1 "+counter+" "+dest+"\n");
+			bw.write(node+"\t1 "+counter+" "+dest+"\n");
 			br.close();
 			bw.close();
 		} catch(Exception e) {
