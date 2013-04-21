@@ -34,7 +34,10 @@ public class PageRank {
 			FileSystem fs = FileSystem.get(URI.create( "s3n://pagerank-test1/pass" + pass ), job.getConfiguration());
 	        FileStatus[] files = fs.listStatus(new Path( "s3n://pagerank-test1/pass" + pass++ ));
 	        for(FileStatus sfs:files){
-	            FileInputFormat.addInputPath(job, sfs.getPath());
+	        	System.out.println(sfs.getPath().toUri().toString());
+	        	if(!sfs.getPath().toUri().toString().contains("_")) {
+	        		FileInputFormat.addInputPath(job, sfs.getPath());
+	        	}
 	        }
 			FileOutputFormat.setOutputPath(job, new Path("s3n://pagerank-test1/pass"+ pass));
 	
