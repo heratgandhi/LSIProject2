@@ -11,8 +11,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class PageRank {
-	public static long nodes = 250;
-	public static long passes = 3;
+	public static long nodes = 685230;
+	public static long passes = 5;
 	public static void main(String[] args) throws Exception {
 		int pass = 0;
 		while(pass < passes)  {
@@ -46,7 +46,7 @@ public class PageRank {
 			long residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
 			System.out.println("Residual value is for pass " + pass + ": "+residue/(long)nodes);
 			
-			Thread.sleep(5000);
+			//Not needed - Thread.sleep(5000);
 		}
 	}
 }
