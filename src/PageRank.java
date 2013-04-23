@@ -14,6 +14,7 @@ public class PageRank {
 	public static long nodes = 685230;
 	public static long passes = 5;
 	public static long multiplication_factor = 100000;
+	public static String bucket = "s3n://pagerank-test1/pass";
 	public static void main(String[] args) throws Exception {
 		int pass = 0;
 		while(pass < passes)  {
@@ -32,22 +33,20 @@ public class PageRank {
 			job.setOutputFormatClass(TextOutputFormat.class);
 	
 			//FileInputFormat.addInputPath(job, new Path( ));
-			FileSystem fs = FileSystem.get(URI.create( "s3n://pagerank-test1/pass" + pass ), job.getConfiguration());
-	        FileStatus[] files = fs.listStatus(new Path( "s3n://pagerank-test1/pass" + pass++ ));
+			FileSystem fs = FileSystem.get(URI.create( bucket + pass ), job.getConfiguration());
+	        FileStatus[] files = fs.listStatus(new Path( bucket + pass++ ));
 	        for(FileStatus sfs:files){
 	        	System.out.println(sfs.getPath().toUri().toString());
 	        	if(!sfs.getPath().toUri().toString().contains("_")) {
 	        		FileInputFormat.addInputPath(job, sfs.getPath());
 	        	}
 	        }
-			FileOutputFormat.setOutputPath(job, new Path("s3n://pagerank-test1/pass"+ pass));
+			FileOutputFormat.setOutputPath(job, new Path(bucket+ pass));
 	
 			job.waitForCompletion(true);
 			
 			long residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
 			System.out.println("Residual value is for pass " + pass + ": "+ (residue/(double)nodes)/multiplication_factor);
-			
-			//Not needed - Thread.sleep(5000);
 		}
 	}
 }
