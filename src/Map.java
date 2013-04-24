@@ -107,7 +107,7 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 			} else {
 				list_v += " " + parts[3+i];
 			}			
-			context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text(parts[3+i]+";"+division));
+			context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text(parts[3+i]+";"+source+";"+Double.parseDouble(rank)+";"+deg));//division));
 		}
 		context.write(new Text(source_b), new Text(source+";"+list_v));
 	}

@@ -7,8 +7,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
         RESIDUE
 	}
 	@Override
-	protected void reduce(Text key, Iterable<Text> values,
-			Context context) throws IOException, InterruptedException {
+	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		double sum = 0;
 		String list = "";
 		double prank = 0;
