@@ -98,7 +98,7 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		
 		int deg = Integer.parseInt(parts[2]);
 		
-		String division = (Double.parseDouble(rank) / deg) + "";
+		//String division = (Double.parseDouble(rank) / deg) + "";
 		
 		String list_v = rank;
 		for(int i=0;i<deg;i++) {
@@ -107,8 +107,8 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 			} else {
 				list_v += " " + parts[3+i];
 			}			
-			context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text(parts[3+i]+";"+source+";"+Double.parseDouble(rank)+";"+deg));//division));
+			context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division));
 		}
-		context.write(new Text(source_b), new Text(source+";"+list_v));
+		context.write(new Text(source_b), new Text("i;"+source+";"+list_v));
 	}
 }

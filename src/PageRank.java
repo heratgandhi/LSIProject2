@@ -17,7 +17,8 @@ public class PageRank {
 	public static String bucket = "s3n://pagerank-test1/pass";
 	public static void main(String[] args) throws Exception {
 		int pass = 0;
-		while(pass < passes)  {
+		double residue = 1000;
+		while(residue > 0.001)  {
 			Configuration conf = new Configuration();
 	
 			Job job = new Job(conf, "pagerank");
@@ -45,8 +46,8 @@ public class PageRank {
 	
 			job.waitForCompletion(true);
 			
-			long residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
-			System.out.println("Residual value is for pass " + pass + ": "+ (residue/(double)nodes)/multiplication_factor);
+			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
+			System.out.println("Residual value is for pass " + pass + ": "+ (residue/nodes)/multiplication_factor);
 		}
 	}
 }
