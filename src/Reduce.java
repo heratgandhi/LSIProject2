@@ -31,29 +31,15 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 	
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		double sum = 0;
-		String list = "";
-		double prank = 0;
-		double residue = 0;
-		double rank = 0;
-		int deg = 0;
 		
-		Hashtable<Long, Double> tpr = new Hashtable<Long,Double>();
-		Hashtable<Long, Double> ppr = new Hashtable<Long, Double>();
-		Hashtable<Long, Double> cpr = new Hashtable<Long, Double>();
+		Hashtable<Long, Double> tpr = new Hashtable<Long,Double>(); //Prev iteration values
+		Hashtable<Long, Double> ppr = new Hashtable<Long, Double>(); //Prev pass values
+		Hashtable<Long, Double> cpr = new Hashtable<Long, Double>(); //Current iteration values
 		Hashtable<Long, Double> degree = new Hashtable<Long, Double>();
 		Hashtable<Long, String> info = new Hashtable<Long,String>();
 		String[] parts = null;
 		
 		for(Text val : values) {
-			/*try {
-				sum += Double.parseDouble(val.toString());				
-			} catch(Exception e) { 
-				list = val.toString();
-				prank = Double.parseDouble(list.split(" ")[0]);
-				list = list.substring(list.indexOf(" ")+1);
-				deg = list.split(" ").length;
-			}*/
 			if(val.charAt(0) == 'p') {
 				//Page rank computation values
 				parts = val.toString().split(";");
@@ -61,7 +47,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				tpr.put(new Long(parts[2]), new Double(Double.parseDouble(parts[3])));
 				degree.put(new Long(parts[2]), new Double(Double.parseDouble(parts[4])));
 			} else {
-				//Normal information
+				//Information
 				parts = val.toString().split(";");
 				info.put(new Long(parts[1]), parts[2]);
 				ppr.put(new Long(parts[1]), new Double(Double.parseDouble(parts[2].split(" ")[0])) );
@@ -114,12 +100,5 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		System.out.println("Residual:" + residual);
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
 		context.getCounter(ResidualCounter.RESIDUE).increment((long)residual);
-		/*if(deg > 0) {
-			rank = ((0.15)/PageRank.nodes) + (0.85 * sum); 
-			residue = Math.abs(rank - prank) / rank;
-			residue *= PageRank.multiplication_factor; //To map residual to the long rank
-			context.getCounter(ResidualCounter.RESIDUE).increment((long)residue);
-			context.write(key, new Text(sum+" "+deg+" "+list));
-		}*/
 	}
 }
