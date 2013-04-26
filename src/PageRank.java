@@ -38,13 +38,15 @@ public class PageRank {
 
 			//FileInputFormat.addInputPath(job, new Path( ));
 			FileSystem fs = FileSystem.get(URI.create( bucket + pass ), job.getConfiguration());
-	        FileStatus[] files = fs.listStatus(new Path( bucket + pass++ ));
+	        FileStatus[] files = fs.listStatus(new Path( bucket + pass ));
 	        for(FileStatus sfs:files){
 	        	System.out.println(sfs.getPath().toUri().toString());
 	        	if(!sfs.getPath().toUri().toString().contains("_")) {
 	        		FileInputFormat.addInputPath(job, sfs.getPath());
 	        	}
 	        }
+	        pass++;
+	        fs.delete(new Path(bucket+pass),true);
 			FileOutputFormat.setOutputPath(job, new Path(bucket+ pass));
 
 			job.waitForCompletion(true);
