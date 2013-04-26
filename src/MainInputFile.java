@@ -38,6 +38,7 @@ public class MainInputFile {
 			}
 			bw.write(currentBlock+"\t"+ node + " " +(1/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
 			br.close();
+			br1.close();
 			bw.close();
 		} catch(Exception e) {
 			e.printStackTrace();

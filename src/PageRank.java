@@ -11,28 +11,31 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class PageRank {
-	public static long nodes = 685230;
+	public static long nodes = 5;
 	public static long passes = 5;
 	public static long multiplication_factor = 100000;
-	public static String bucket = "s3n://pagerank-test1/pass";
+	public static String bucket = "s3n://wordcount-test-herat/pass";
 	public static void main(String[] args) throws Exception {
 		int pass = 0;
 		double residue = 1000;
+		
+		bucket = args[0];
+		
 		while(residue > 0.001)  {
 			Configuration conf = new Configuration();
-	
+
 			Job job = new Job(conf, "pagerank");
 			job.setJarByClass(PageRank.class);
-	
+
 			job.setOutputKeyClass(Text.class);
 			job.setOutputValueClass(Text.class);
-	
+
 			job.setMapperClass(Map.class);
 			job.setReducerClass(Reduce.class);
-	
+
 			job.setInputFormatClass(TextInputFormat.class);
 			job.setOutputFormatClass(TextOutputFormat.class);
-	
+
 			//FileInputFormat.addInputPath(job, new Path( ));
 			FileSystem fs = FileSystem.get(URI.create( bucket + pass ), job.getConfiguration());
 	        FileStatus[] files = fs.listStatus(new Path( bucket + pass++ ));
@@ -43,9 +46,9 @@ public class PageRank {
 	        	}
 	        }
 			FileOutputFormat.setOutputPath(job, new Path(bucket+ pass));
-	
+
 			job.waitForCompletion(true);
-			
+
 			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
 			System.out.println("Residual value is for pass " + pass + ": "+ (residue/nodes)/multiplication_factor);
 		}

@@ -17,6 +17,7 @@ public class MappingGeneration {
 				System.out.println("blocklimits["+no+"] = "+line.trim()+";");
 				no++;
 			}
+			br.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

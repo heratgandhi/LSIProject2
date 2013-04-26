@@ -22,6 +22,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    cnt++;
 		}
 		residual /= cnt;
+		System.out.println("Reducer block residue: "+residual);
 		if(residual <= 0.001) {
 			return true;
 		} else {
@@ -39,7 +40,12 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		Hashtable<Long, String> info = new Hashtable<Long,String>();
 		String[] parts = null;
 		
+		System.out.println("Got :" + key+ " ");
+		ArrayList<Text> values1 = new ArrayList<Text>();
+		
 		for(Text val : values) {
+			System.out.println("Value: "+val.toString());
+			values1.add(val);
 			if(val.charAt(0) == 'p') {
 				//Page rank computation values
 				parts = val.toString().split(";");
@@ -59,17 +65,19 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		boolean first = true;
 		Enumeration<Long> enumKey;
 		do {
+			
 			if(!first) {
 				enumKey = cpr.keys();
 				while(enumKey.hasMoreElements()) {
 				    Long keyv = enumKey.nextElement();
 				    tpr.put(keyv,cpr.get(keyv));
-				}
-			}
-			for(Text val : values) {
-				if(val.charAt(0) == 'p') {
-					parts = val.toString().split(";");
-					division = tpr.get(parts[2]).doubleValue() / degree.get(parts[2]).doubleValue();
+				}				
+			}			
+			for(Text val1 : values1) {
+				System.out.println("Value2: " + val1.toString());
+				if(val1.charAt(0) == 'p') {
+					parts = val1.toString().split(";");
+					division = tpr.get(new Long(parts[2])).doubleValue() / degree.get(new Long(parts[2])).doubleValue();
 					if(cpr.get(parts[1]) != null) {
 						cpr.put(new Long( parts[1] ), new Double( cpr.get(parts[1]).doubleValue() + division  ));
 					} else {
@@ -94,8 +102,8 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    val = Math.abs(cpr.get(keyv).doubleValue() - ppr.get(keyv).doubleValue());
 		    val /= cpr.get(keyv).doubleValue();
 		    residual += val;
-		    
-		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv)+ " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1))) );
+		    System.out.println(val);
+		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()+ " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1))) );
 		}
 		System.out.println("Residual:" + residual);
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
