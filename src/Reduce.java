@@ -9,6 +9,14 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
         RESIDUE
 	}
 	
+	void printTable(Hashtable<Long,Double> t) {
+		Enumeration<Long> enumKey = t.keys();
+		while(enumKey.hasMoreElements()) {
+		    Long key = enumKey.nextElement();
+		    System.out.println(key + "  " + t.get(key));
+		}
+	}
+	
 	boolean checkconvergence(Hashtable<Long,Double> tpr, Hashtable<Long,Double> cpr) {
 		Enumeration<Long> enumKey = cpr.keys();
 		double residual = 0;
@@ -77,14 +85,18 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				}				
 			}			
 			for(String val1 : values1) {
-				//System.out.println("Value2: " + val1.toString());
+				System.out.println("Value: " + val1);
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
-					division = tpr.get(new Long(parts[2])).doubleValue() / degree.get(new Long(parts[2])).doubleValue();
-					if(cpr.get(parts[1]) != null) {
-						cpr.put(new Long( parts[1] ), new Double( cpr.get(parts[1]).doubleValue() + division  ));
+					division = tpr.get(new Long(parts[2])).floatValue() / degree.get(new Long(parts[2])).floatValue();
+					System.out.println("Division:" + division);
+					if(cpr.get(new Long(parts[1])) != null) {
+						System.out.println("Sum:" + (cpr.get(new Long(parts[1])).floatValue() + division));
+						cpr.put(new Long( parts[1] ), new Double( cpr.get(new Long(parts[1])).floatValue() + division  ));
+						System.out.println("Check sum:" + cpr.get(new Long(parts[1])).floatValue());
 					} else {
 						cpr.put(new Long( parts[1] ), new Double( division ));
+						System.out.println("Check sum 0:" + cpr.get(new Long(parts[1])).floatValue());
 					}
 				}
 			}
@@ -94,7 +106,13 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			    //System.out.println(keyv+" "+tpr.get(keyv));
 			    cpr.put(keyv, (0.15/PageRank.nodes) + (0.85 * cpr.get(keyv).doubleValue()) );
 			}
-			first = false;			
+			first = false;
+			//System.out.println("degree");
+			//printTable(degree);
+			System.out.println("tpr");
+			printTable(tpr);
+			System.out.println("cpr");
+			printTable(cpr);
 		} while(!checkconvergence(tpr,cpr));
 		
 		enumKey = cpr.keys();
