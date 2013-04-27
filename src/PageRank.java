@@ -52,7 +52,8 @@ public class PageRank {
 			job.waitForCompletion(true);
 
 			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
-			System.out.println("Residual value is for pass " + pass + ": "+ (residue/nodes)/multiplication_factor);
+			residue = (residue/nodes)/multiplication_factor;
+			System.out.println("Residual value is for pass " + pass + ": "+ residue);
 		}
 	}
 }

@@ -16,8 +16,11 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		long cnt = 0;
 		while(enumKey.hasMoreElements()) {
 		    Long key = enumKey.nextElement();
+		    //System.out.println("dfsf:" + cpr.get(key).doubleValue());
 		    val = Math.abs(tpr.get(key).doubleValue() - cpr.get(key).doubleValue());
-		    val /= cpr.get(key).doubleValue();
+		    if(cpr.get(key).doubleValue() != 0) {
+		    	val /= cpr.get(key).doubleValue();
+		    }
 		    residual += val;
 		    cnt++;
 		}
@@ -40,12 +43,12 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		Hashtable<Long, String> info = new Hashtable<Long,String>();
 		String[] parts = null;
 		
-		System.out.println("Got :" + key+ " ");
-		ArrayList<Text> values1 = new ArrayList<Text>();
+		//System.out.println("Got :" + key+ " ");
+		ArrayList<String> values1 = new ArrayList<String>();
 		
 		for(Text val : values) {
-			System.out.println("Value: "+val.toString());
-			values1.add(val);
+			//System.out.println("Value: "+val.toString());
+			values1.add(val.toString());
 			if(val.charAt(0) == 'p') {
 				//Page rank computation values
 				parts = val.toString().split(";");
@@ -65,16 +68,16 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		boolean first = true;
 		Enumeration<Long> enumKey;
 		do {
-			
 			if(!first) {
+				//System.out.println("Copying...");
 				enumKey = cpr.keys();
 				while(enumKey.hasMoreElements()) {
 				    Long keyv = enumKey.nextElement();
 				    tpr.put(keyv,cpr.get(keyv));
 				}				
 			}			
-			for(Text val1 : values1) {
-				System.out.println("Value2: " + val1.toString());
+			for(String val1 : values1) {
+				//System.out.println("Value2: " + val1.toString());
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
 					division = tpr.get(new Long(parts[2])).doubleValue() / degree.get(new Long(parts[2])).doubleValue();
@@ -88,11 +91,11 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			enumKey = cpr.keys();
 			while(enumKey.hasMoreElements()) {
 			    Long keyv = enumKey.nextElement();
+			    //System.out.println(keyv+" "+tpr.get(keyv));
 			    cpr.put(keyv, (0.15/PageRank.nodes) + (0.85 * cpr.get(keyv).doubleValue()) );
 			}
-			first = false;
-			
-		} while(checkconvergence(tpr,cpr));
+			first = false;			
+		} while(!checkconvergence(tpr,cpr));
 		
 		enumKey = cpr.keys();
 		double residual = 0;
@@ -102,7 +105,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    val = Math.abs(cpr.get(keyv).doubleValue() - ppr.get(keyv).doubleValue());
 		    val /= cpr.get(keyv).doubleValue();
 		    residual += val;
-		    System.out.println(val);
+		    //System.out.println(key+" "+keyv);
 		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()+ " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1))) );
 		}
 		System.out.println("Residual:" + residual);
