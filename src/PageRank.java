@@ -17,11 +17,11 @@ public class PageRank {
 	public static String bucket = "s3n://wordcount-test-herat/pass";
 	public static void main(String[] args) throws Exception {
 		int pass = 0;
-		double residue = 1000;
+		float residue = 1000;
 		
 		bucket = args[0];
 		
-		while(residue > 0.001)  {
+		while(residue > 0.001f)  {
 			Configuration conf = new Configuration();
 
 			Job job = new Job(conf, "pagerank");

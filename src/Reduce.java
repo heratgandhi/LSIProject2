@@ -9,7 +9,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
         RESIDUE
 	}
 	
-	void printTable(Hashtable<Long,Double> t) {
+	void printTable(Hashtable<Long,Float> t) {
 		Enumeration<Long> enumKey = t.keys();
 		while(enumKey.hasMoreElements()) {
 		    Long key = enumKey.nextElement();
@@ -17,24 +17,25 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		}
 	}
 	
-	boolean checkconvergence(Hashtable<Long,Double> tpr, Hashtable<Long,Double> cpr) {
+	boolean checkconvergence(Hashtable<Long,Float> tpr, Hashtable<Long,Float> cpr) {
 		Enumeration<Long> enumKey = cpr.keys();
-		double residual = 0;
-		double val;
+		float residual = 0;
+		float val;
 		long cnt = 0;
 		while(enumKey.hasMoreElements()) {
 		    Long key = enumKey.nextElement();
-		    //System.out.println("dfsf:" + cpr.get(key).doubleValue());
-		    val = Math.abs(tpr.get(key).doubleValue() - cpr.get(key).doubleValue());
-		    if(cpr.get(key).doubleValue() != 0) {
-		    	val /= cpr.get(key).doubleValue();
+		    //System.out.println("dfsf:" + cpr.get(key));
+		    val = Math.abs(tpr.get(key) - cpr.get(key));
+		    if(cpr.get(key) != 0) {
+		    	val /= cpr.get(key);
 		    }
 		    residual += val;
 		    cnt++;
 		}
 		residual /= cnt;
+		//residual = (float) (Math.round(residual * 10000.0) / 10000.0);
 		System.out.println("Reducer block residue: "+residual);
-		if(residual <= 0.001) {
+		if(residual <= 0.001f) {
 			return true;
 		} else {
 			return false;
@@ -44,10 +45,10 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		
-		Hashtable<Long, Double> tpr = new Hashtable<Long,Double>(); //Prev iteration values
-		Hashtable<Long, Double> ppr = new Hashtable<Long, Double>(); //Prev pass values
-		Hashtable<Long, Double> cpr = new Hashtable<Long, Double>(); //Current iteration values
-		Hashtable<Long, Double> degree = new Hashtable<Long, Double>();
+		Hashtable<Long, Float> tpr = new Hashtable<Long,Float>(); //Prev iteration values
+		Hashtable<Long, Float> ppr = new Hashtable<Long, Float>(); //Prev pass values
+		Hashtable<Long, Float> cpr = new Hashtable<Long, Float>(); //Current iteration values
+		Hashtable<Long, Float> degree = new Hashtable<Long, Float>();
 		Hashtable<Long, String> info = new Hashtable<Long,String>();
 		String[] parts = null;
 		
@@ -60,19 +61,19 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			if(val.charAt(0) == 'p') {
 				//Page rank computation values
 				parts = val.toString().split(";");
-				ppr.put(new Long(parts[2]), new Double(Double.parseDouble(parts[3])));
-				tpr.put(new Long(parts[2]), new Double(Double.parseDouble(parts[3])));
-				degree.put(new Long(parts[2]), new Double(Double.parseDouble(parts[4])));
+				ppr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
+				tpr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
+				degree.put(new Long(parts[2]), Float.parseFloat(parts[4]));
 			} else {
 				//Information
 				parts = val.toString().split(";");
 				info.put(new Long(parts[1]), parts[2]);
-				ppr.put(new Long(parts[1]), new Double(Double.parseDouble(parts[2].split(" ")[0])) );
-				tpr.put(new Long(parts[1]), new Double(Double.parseDouble(parts[2].split(" ")[0])) );
-				degree.put(new Long(parts[1]), new Double(parts[2].split(" ").length-1));
+				ppr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
+				tpr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
+				degree.put(new Long(parts[1]), (float) (parts[2].split(" ").length-1));
 			}
 		}
-		double division = 0;
+		float division = 0;
 		boolean first = true;
 		Enumeration<Long> enumKey;
 		do {
@@ -82,21 +83,30 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				while(enumKey.hasMoreElements()) {
 				    Long keyv = enumKey.nextElement();
 				    tpr.put(keyv,cpr.get(keyv));
+				    cpr.put(keyv, 0.0f);
 				}				
 			}			
 			for(String val1 : values1) {
-				System.out.println("Value: " + val1);
+				//System.out.println("Value: " + val1);
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
-					division = tpr.get(new Long(parts[2])).floatValue() / degree.get(new Long(parts[2])).floatValue();
+					
+					division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
+					
 					System.out.println("Division:" + division);
+					
 					if(cpr.get(new Long(parts[1])) != null) {
-						System.out.println("Sum:" + (cpr.get(new Long(parts[1])).floatValue() + division));
-						cpr.put(new Long( parts[1] ), new Double( cpr.get(new Long(parts[1])).floatValue() + division  ));
-						System.out.println("Check sum:" + cpr.get(new Long(parts[1])).floatValue());
+						
+						System.out.println("Sum:" + (cpr.get(new Long(parts[1])) + division));
+						
+						cpr.put(new Long( parts[1] ), cpr.get(new Long(parts[1])) + division);
+						
+						System.out.println("Check sum:" + cpr.get(new Long(parts[1])) );
 					} else {
-						cpr.put(new Long( parts[1] ), new Double( division ));
-						System.out.println("Check sum 0:" + cpr.get(new Long(parts[1])).floatValue());
+						
+						cpr.put(new Long( parts[1] ), division);
+						
+						System.out.println("Check sum 0:" + cpr.get(new Long(parts[1])) );
 					}
 				}
 			}
@@ -104,11 +114,11 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			while(enumKey.hasMoreElements()) {
 			    Long keyv = enumKey.nextElement();
 			    //System.out.println(keyv+" "+tpr.get(keyv));
-			    cpr.put(keyv, (0.15/PageRank.nodes) + (0.85 * cpr.get(keyv).doubleValue()) );
+			    float tmp = ((0.15f / PageRank.nodes) + (0.85f * cpr.get(keyv)));
+			    cpr.put(keyv, tmp);
 			}
 			first = false;
-			//System.out.println("degree");
-			//printTable(degree);
+			
 			System.out.println("tpr");
 			printTable(tpr);
 			System.out.println("cpr");
@@ -116,18 +126,18 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		} while(!checkconvergence(tpr,cpr));
 		
 		enumKey = cpr.keys();
-		double residual = 0;
-		double val;
+		float residual = 0;
+		float val;
 		while(enumKey.hasMoreElements()) {
 		    Long keyv = enumKey.nextElement();
-		    val = Math.abs(cpr.get(keyv).doubleValue() - ppr.get(keyv).doubleValue());
-		    val /= cpr.get(keyv).doubleValue();
+		    val = Math.abs(cpr.get(keyv) - ppr.get(keyv));
+		    val /= cpr.get(keyv);
 		    residual += val;
 		    //System.out.println(key+" "+keyv);
 		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()+ " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1))) );
 		}
-		System.out.println("Residual:" + residual);
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
+		System.out.println("Residual:" + residual);
 		context.getCounter(ResidualCounter.RESIDUE).increment((long)residual);
 	}
 }
