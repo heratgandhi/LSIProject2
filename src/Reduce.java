@@ -26,14 +26,16 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    Long key = enumKey.nextElement();
 		    //System.out.println("dfsf:" + cpr.get(key));
 		    val = Math.abs(tpr.get(key) - cpr.get(key));
+		    
 		    if(cpr.get(key) != 0) {
+		    	System.out.println("---Division by:" + cpr.get(key));
 		    	val /= cpr.get(key);
 		    }
 		    residual += val;
 		    cnt++;
 		}
 		residual /= cnt;
-		residual = (float) (Math.round(residual * 100000) / 100000);
+		//residual = (float) (Math.round(residual * 10000) / 10000);
 		
 		System.out.println("Reducer block residue: "+residual);
 		
@@ -70,9 +72,18 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				//Information
 				parts = val.toString().split(";");
 				info.put(new Long(parts[1]), parts[2]);
-				ppr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
-				tpr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
-				degree.put(new Long(parts[1]), (float) (parts[2].split(" ").length-1));
+				if(parts[2].charAt(0) != ' ') {
+					ppr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
+					tpr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
+					cpr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
+					degree.put(new Long(parts[1]), (float) (parts[2].split(" ").length-1));
+				} else {
+					String t = parts[2].substring(1);
+					ppr.put(new Long(parts[1]), Float.parseFloat(t.split(" ")[0]) );
+					cpr.put(new Long(parts[1]), Float.parseFloat(t.split(" ")[0]) );
+					tpr.put(new Long(parts[1]), Float.parseFloat(t.split(" ")[0]) );
+					degree.put(new Long(parts[1]), 0.0f);
+				}
 			}
 		}
 		float division = 0;
@@ -87,14 +98,20 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				    tpr.put(keyv,cpr.get(keyv));
 				    cpr.put(keyv, 0.0f);
 				}				
-			}			
+			} else {
+				enumKey = cpr.keys();
+				while(enumKey.hasMoreElements()) {
+					Long keyv = enumKey.nextElement();
+				    cpr.put(keyv, 0.0f);
+				}
+			}
 			for(String val1 : values1) {
 				//System.out.println("Value: " + val1);
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
 					
 					division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
-					division = (float) Math.round(division * 100000) / 100000;
+					division = (float) Math.round(division * 10000) / 10000;
 					//System.out.println("Division:" + division);
 					
 					if(cpr.get(new Long(parts[1])) != null) {
@@ -117,7 +134,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			    Long keyv = enumKey.nextElement();
 			    //System.out.println(keyv+" "+tpr.get(keyv));
 			    float tmp = ((0.15f / PageRank.nodes) + (0.85f * cpr.get(keyv)));
-			    tmp = (float) Math.round(tmp * 100000) / 100000;
+			    //tmp = (float) Math.round(tmp * 10000) / 10000;
 			    cpr.put(keyv, tmp);
 			}
 			first = false;
@@ -137,9 +154,9 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    val /= cpr.get(keyv);
 		    residual += val;
 		    //System.out.println(key+" "+keyv);
-		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()+ " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1))) );
+		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue() + " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1)) ) );
 		}
-		residual = (float) Math.round(residual * 100000) / 100000;
+		//residual = (float) Math.round(residual * 10000) / 10000;
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
 		
 		System.out.println("Residual:" + residual);

@@ -41,7 +41,7 @@ public class PageRank {
 			FileSystem fs = FileSystem.get(URI.create( bucket + pass ), job.getConfiguration());
 	        FileStatus[] files = fs.listStatus(new Path( bucket + pass ));
 	        for(FileStatus sfs:files){
-	        	System.out.println(sfs.getPath().toUri().toString());
+	        	//System.out.println(sfs.getPath().toUri().toString());
 	        	if(!sfs.getPath().toUri().toString().contains("_")) {
 	        		FileInputFormat.addInputPath(job, sfs.getPath());
 	        	}
@@ -54,6 +54,8 @@ public class PageRank {
 
 			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
 			residue = (residue/(float)nodes)/multiplication_factor;
+			//residue = (float) Math.round(residue * 1000) / 1000;
+			
 			System.out.println("Residual value is for pass " + pass + ": "+ residue);
 		}
 	}

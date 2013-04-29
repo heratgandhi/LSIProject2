@@ -19,7 +19,7 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 			throws IOException, InterruptedException {
 		String line = value.toString();
 		
-		long[] blocklimits = new long[68];
+		/*long[] blocklimits = new long[68];
 		blocklimits[0] = 10328;
 		blocklimits[1] = 20373;
 		blocklimits[2] = 30629;
@@ -87,12 +87,12 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		blocklimits[64] = 655804;
 		blocklimits[65] = 665666;
 		blocklimits[66] = 675448;
-		blocklimits[67] = 685230;
+		blocklimits[67] = 685230;*/
 		
-		/*long[] blocklimits = new long[3];
-		blocklimits[0] = 2;
-		blocklimits[1] = 3;
-		blocklimits[2] = 5;*/
+		long[] blocklimits = new long[3];
+		blocklimits[0] = 3;
+		blocklimits[1] = 4;
+		blocklimits[2] = 6;
 		
 		String[] parts1 = line.split("\t");
 		String source_b = parts1[0];
@@ -102,21 +102,23 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		String rank = parts[1];
 		
 		int deg = Integer.parseInt(parts[2]);
-		
-		//String division = (Double.parseDouble(rank) / deg) + "";
-		
-		String list_v = rank;
-		for(int i=0;i<deg;i++) {
-			if(list_v == "") {
-				list_v += parts[3+i];
-			} else {
-				list_v += " " + parts[3+i];
+		if(deg != 0) {
+			String list_v = rank;
+			for(int i=0;i<deg;i++) {
+				if(list_v == "") {
+					list_v += parts[3+i];
+				} else {
+					list_v += " " + parts[3+i];
+				}
+				System.out.println(blockNo(Long.parseLong(parts[3+i]), blocklimits));
+				System.out.println(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+"")+" " + new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division))
+				context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division));
 			}
-			System.out.println(blockNo(Long.parseLong(parts[3+i]), blocklimits));
-			System.out.println(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+"")+" " + new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division))
-			context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division));
+			System.out.println(new Text(source_b)+" "+new Text("i;"+source+";"+list_v));
+			context.write(new Text(source_b), new Text("i;"+source+";"+list_v));
+		} else {
+			context.write(new Text(source_b), new Text("i;"+source+"; "+rank+" 0"));
 		}
-		System.out.println(new Text(source_b)+" "+new Text("i;"+source+";"+list_v));
-		context.write(new Text(source_b), new Text("i;"+source+";"+list_v));
+		
 	}
 }
