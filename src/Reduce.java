@@ -33,8 +33,10 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    cnt++;
 		}
 		residual /= cnt;
-		//residual = (float) (Math.round(residual * 10000.0) / 10000.0);
+		residual = (float) (Math.round(residual * 10000.0) / 10000.0);
+		
 		System.out.println("Reducer block residue: "+residual);
+		
 		if(residual <= 0.001f) {
 			return true;
 		} else {
@@ -92,21 +94,21 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 					parts = val1.toString().split(";");
 					
 					division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
-					
-					System.out.println("Division:" + division);
+					division = (float) Math.round(division * 10000) / 10000;
+					//System.out.println("Division:" + division);
 					
 					if(cpr.get(new Long(parts[1])) != null) {
 						
-						System.out.println("Sum:" + (cpr.get(new Long(parts[1])) + division));
+						//System.out.println("Sum:" + (cpr.get(new Long(parts[1])) + division));
 						
 						cpr.put(new Long( parts[1] ), cpr.get(new Long(parts[1])) + division);
 						
-						System.out.println("Check sum:" + cpr.get(new Long(parts[1])) );
+						//System.out.println("Check sum:" + cpr.get(new Long(parts[1])) );
 					} else {
 						
 						cpr.put(new Long( parts[1] ), division);
 						
-						System.out.println("Check sum 0:" + cpr.get(new Long(parts[1])) );
+						//System.out.println("Check sum 0:" + cpr.get(new Long(parts[1])) );
 					}
 				}
 			}
@@ -115,6 +117,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			    Long keyv = enumKey.nextElement();
 			    //System.out.println(keyv+" "+tpr.get(keyv));
 			    float tmp = ((0.15f / PageRank.nodes) + (0.85f * cpr.get(keyv)));
+			    tmp = (float) Math.round(tmp * 10000) / 10000;
 			    cpr.put(keyv, tmp);
 			}
 			first = false;
@@ -136,7 +139,9 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    //System.out.println(key+" "+keyv);
 		    context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()+ " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1))) );
 		}
+		residual = (float) Math.round(residual * 10000) / 10000;
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
+		
 		System.out.println("Residual:" + residual);
 		context.getCounter(ResidualCounter.RESIDUE).increment((long)residual);
 	}

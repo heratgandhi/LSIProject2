@@ -20,13 +20,14 @@ public class PageRank {
 		float residue = 1000;
 		
 		bucket = args[0];
+		nodes = Long.parseLong(args[1]);
 		
 		while(residue > 0.001f)  {
 			Configuration conf = new Configuration();
 
 			Job job = new Job(conf, "pagerank");
 			job.setJarByClass(PageRank.class);
-
+			
 			job.setOutputKeyClass(Text.class);
 			job.setOutputValueClass(Text.class);
 
@@ -52,7 +53,7 @@ public class PageRank {
 			job.waitForCompletion(true);
 
 			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
-			residue = (residue/nodes)/multiplication_factor;
+			residue = (residue/(float)nodes)/multiplication_factor;
 			System.out.println("Residual value is for pass " + pass + ": "+ residue);
 		}
 	}
