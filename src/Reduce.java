@@ -35,7 +35,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		    cnt++;
 		}
 		residual /= cnt;
-		//residual = (float) (Math.round(residual * 10000) / 10000);
+		residual = (float) (Math.round(residual * 10000) / 10000);
 		
 		System.out.println("Reducer block residue: "+residual);
 		
@@ -129,7 +129,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			    if(indegree.get(keyv) != null) {
 			    	float tmp = (float) ((0.15 / PageRank.nodes) + (0.85 * cpr.get(keyv)));
 			    	System.out.println(tmp);
-			    	//tmp = (float) Math.round(tmp * 10000) / 10000;
+			    	tmp = (float) Math.round(tmp * 10000) / 10000;
 			    	cpr.put(keyv, tmp);
 			    	//System.out.println("Get: " + cpr.get(keyv));
 			    }
