@@ -97,6 +97,53 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				}
 			}
 		}
+		
+		//Code for BFS ordering
+		ArrayList<Long> start_nodes = new ArrayList<Long>();
+		for(String st : values1) {
+			if (st.charAt(0) == 'p') {
+				parts = st.toString().split(";");
+				if(info.get(new Long(parts[2])) == null) {
+					if(!start_nodes.contains(new Long(parts[1])))
+						start_nodes.add(new Long(parts[1]));					
+				}
+			}
+		}
+		System.out.println("Initial vertices:");
+		for(Long str1 : start_nodes) {
+			System.out.println(str1);
+		}
+		for(Long nd : start_nodes) {
+			for(String st : values1) {
+				if(st.charAt(0) == 'p') {
+					parts = st.toString().split(";");
+					if(nd == new Long(parts[2]) && !start_nodes.contains(new Long(parts[1])) ) {
+						start_nodes.add(new Long(parts[1]));
+					}
+				}
+			}
+		}
+		System.out.println("All vertices:");
+		for(Long str1 : start_nodes) {
+			System.out.println(str1);
+		}
+		ArrayList<String> values2 = new ArrayList<String>();
+		for(Long nd : start_nodes) {
+			for(String st : values1) {
+				if(st.charAt(0) == 'p') {
+					parts = st.toString().split(";");
+					if(nd == new Long(parts[2]) && !values2.contains(st) ) {
+						values2.add(st);
+					}
+				}
+			}
+		}
+		System.out.println("Sorted p msgs:");
+		for(String str1 : values2) {
+			System.out.println(str1);
+		}
+		
+		//Page rank computation
 		float division = 0;
 		boolean first = true;
 		Enumeration<Long> enumKey;
@@ -119,7 +166,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 						cpr.put(keyv, 0.0f);
 				}
 			}
-			for(String val1 : values1) {
+			for(String val1 : values2) {
 				//System.out.println("Value: " + val1);
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
