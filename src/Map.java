@@ -19,7 +19,7 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 			throws IOException, InterruptedException {
 		String line = value.toString();
 		
-		long[] blocklimits = new long[68];
+		/*long[] blocklimits = new long[68];
 		blocklimits[0] = 10328;
 		blocklimits[1] = 20373;
 		blocklimits[2] = 30629;
@@ -87,14 +87,12 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		blocklimits[64] = 655804;
 		blocklimits[65] = 665666;
 		blocklimits[66] = 675448;
-		blocklimits[67] = 685230;
+		blocklimits[67] = 685230;*/
 		
-		/*long[] blocklimits = new long[5];
-		blocklimits[0] = 2;
-		blocklimits[1] = 3;
-		blocklimits[2] = 4;
-		blocklimits[3] = 5;
-		blocklimits[4] = 6;*/
+		long[] blocklimits = new long[3];
+		blocklimits[0] = 1;
+		blocklimits[1] = 4;
+		blocklimits[2] = 5;
 		
 		String[] parts1 = line.split("\t");
 		String source_b = parts1[0];

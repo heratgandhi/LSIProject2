@@ -68,6 +68,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			if(val.charAt(0) == 'p') {
 				//Page rank computation values
 				parts = val.toString().split(";");
+				System.out.println("Got p msg for: "+parts[1]+" from "+parts[2]);
 				ppr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
 				tpr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
 				indegree.put(new Long(parts[1]), 1.0f);
@@ -113,14 +114,28 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		for(Long str1 : start_nodes) {
 			System.out.println(str1);
 		}
-		for(Long nd : start_nodes) {
-			for(String st : values1) {
-				if(st.charAt(0) == 'p') {
-					parts = st.toString().split(";");
-					if(nd == new Long(parts[2]) && !start_nodes.contains(new Long(parts[1])) ) {
-						start_nodes.add(new Long(parts[1]));
+		long prevlen = start_nodes.size() - 1;
+		ArrayList<Long> visited = new ArrayList<Long>();
+		ArrayList<Long> new_elems = new ArrayList<Long>();
+		while( prevlen != start_nodes.size() ) {
+			for(Long nd : start_nodes) {
+				if(!visited.contains(nd)) {
+					for(String st : values1) {
+						if(st.charAt(0) == 'p') {
+							parts = st.toString().split(";");
+							//System.out.println("Source: " + parts[2]);
+							if(nd.longValue() == new Long(parts[2]).longValue() && !start_nodes.contains(new Long(parts[1])) ) {
+							//System.out.println("adding...");
+							new_elems.add(new Long(parts[1]));
+							}
+						}
 					}
+					visited.add(nd);
 				}
+			}
+			prevlen = start_nodes.size();
+			for (Long e : new_elems) {
+				start_nodes.add(e);
 			}
 		}
 		System.out.println("All vertices:");
