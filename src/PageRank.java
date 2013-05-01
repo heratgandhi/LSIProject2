@@ -11,7 +11,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class PageRank {
-	public static long nodes = 5;
+	public static long nodes = 685230;
 	public static long passes = 5;
 	public static long multiplication_factor = 10000;
 	public static String bucket = "s3n://wordcount-test-herat/pass";
