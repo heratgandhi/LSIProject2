@@ -112,11 +112,11 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 				} else {
 					list_v += " " + parts[3+i];
 				}
-				System.out.println(blockNo(Long.parseLong(parts[3+i]), blocklimits));
-				System.out.println(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+"")+" " + new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division))
+				//System.out.println(blockNo(Long.parseLong(parts[3+i]), blocklimits));
+				//System.out.println(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+"")+" " + new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division))
 				context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division));
 			}
-			System.out.println(new Text(source_b)+" "+new Text("i;"+source+";"+list_v));
+			//System.out.println(new Text(source_b)+" "+new Text("i;"+source+";"+list_v));
 			context.write(new Text(source_b), new Text("i;"+source+";"+list_v));
 		} else {
 			context.write(new Text(source_b), new Text("i;"+source+"; "+rank+" 0"));

@@ -53,7 +53,7 @@ public class PageRank {
 
 			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
 			residue = (residue/(float)nodes)/multiplication_factor;
-			//residue = (float) Math.round(residue * 1000) / 1000;
+			residue = (float) Math.round(residue * 1000) / 1000;
 			
 			System.out.println("Residual value is for pass " + pass + ": "+ residue);
 		}
