@@ -6,7 +6,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 public class Reduce extends Reducer<Text, Text, Text, Text> {
 	public static enum ResidualCounter {
-        RESIDUE
+        RESIDUE,
+        PASSES
 	}
 	
 	void printTable(Hashtable<Long,Float> t) {
@@ -56,6 +57,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		Hashtable<Long, Float> indegree = new Hashtable<Long, Float>();
 		Hashtable<Long, String> info = new Hashtable<Long,String>();
 		String[] parts = null;
+		long max_node = -1;
 		
 		//System.out.println("Got :" + key+ " ");
 		ArrayList<String> values1 = new ArrayList<String>();
@@ -79,18 +81,26 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 					tpr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
 					cpr.put(new Long(parts[1]), Float.parseFloat(parts[2].split(" ")[0]) );
 					degree.put(new Long(parts[1]), (float) (parts[2].split(" ").length-1));
+					
+					if(Long.parseLong(parts[1]) > max_node) {
+						max_node = Long.parseLong(parts[1]);
+					}
 				} else {
 					String t = parts[2].substring(1);
 					ppr.put(new Long(parts[1]), Float.parseFloat(t.split(" ")[0]) );
 					cpr.put(new Long(parts[1]), Float.parseFloat(t.split(" ")[0]) );
 					tpr.put(new Long(parts[1]), Float.parseFloat(t.split(" ")[0]) );
 					degree.put(new Long(parts[1]), 0.0f);
+					if(Long.parseLong(parts[1]) > max_node) {
+						max_node = Long.parseLong(parts[1]);
+					}
 				}
 			}
 		}
 		float division = 0;
 		boolean first = true;
 		Enumeration<Long> enumKey;
+		int no_passes = 0;
 		do {
 			if(!first) {
 				//System.out.println("Copying...");
@@ -128,18 +138,18 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			    //System.out.println(keyv+" "+cpr.get(keyv)+" "+(0.85 * cpr.get(keyv))+" "+(0.15 / PageRank.nodes)+" "+PageRank.nodes);
 			    if(indegree.get(keyv) != null) {
 			    	float tmp = (float) ((0.15 / PageRank.nodes) + (0.85 * cpr.get(keyv)));
-			    	System.out.println(tmp);
+			    	//System.out.println(tmp);
 			    	//tmp = (float) Math.round(tmp * 10000) / 10000;
 			    	cpr.put(keyv, tmp);
 			    	//System.out.println("Get: " + cpr.get(keyv));
 			    }
 			}
 			first = false;
-			
-			System.out.println("tpr");
-			printTable(tpr);
-			System.out.println("cpr");
-			printTable(cpr);
+			no_passes++;
+			//System.out.println("tpr");
+			//printTable(tpr);
+			//System.out.println("cpr");
+			//printTable(cpr);
 		} while(!checkconvergence(tpr,cpr));
 		
 		enumKey = cpr.keys();
@@ -159,7 +169,10 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		//residual = (float) Math.round(residual * 10000) / 10000;
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
 		
-		System.out.println("Residual:" + residual);
+		System.out.println("Residual: " + residual + " passes: " + no_passes);
+		System.out.println("Max node in this block is: " + max_node + " and its page rank is: "+cpr.get(new Long(max_node)));
+		
+		context.getCounter(ResidualCounter.PASSES).increment(no_passes);
 		context.getCounter(ResidualCounter.RESIDUE).increment((long)residual);
 	}
 }

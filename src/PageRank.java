@@ -56,6 +56,7 @@ public class PageRank {
 			residue = (float) Math.round(residue * 10000) / 10000;
 			
 			System.out.println("Residual value is for pass " + pass + ": "+ residue);
+			System.out.println("Average no. of passes: "+ job.getCounters().findCounter(Reduce.ResidualCounter.PASSES).getValue()/68f);
 		}
 	}
 }
