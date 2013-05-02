@@ -89,10 +89,12 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		blocklimits[66] = 675448;
 		blocklimits[67] = 685230;
 		
-		/*long[] blocklimits = new long[3];
-		blocklimits[0] = 1;
-		blocklimits[1] = 5;
-		blocklimits[2] = 6;*/
+		/*long[] blocklimits = new long[5];
+		blocklimits[0] = 2;
+		blocklimits[1] = 3;
+		blocklimits[2] = 4;
+		blocklimits[3] = 5;
+		blocklimits[4] = 6;*/
 		
 		String[] parts1 = line.split("\t");
 		String source_b = parts1[0];

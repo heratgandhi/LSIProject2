@@ -22,7 +22,6 @@ public class CreateInputFile {
 			while((line = br.readLine())!=null) {
 				
 				counter = Double.parseDouble(line.substring(line.lastIndexOf(" ")));
-				//System.out.print(counter);
 				if(selectInputLine(counter, rejectMin, rejectLimit)) {
 					line = line.substring(0,line.lastIndexOf(" "));
 					lno = line.substring(0,6);

@@ -68,11 +68,8 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			if(val.charAt(0) == 'p') {
 				//Page rank computation values
 				parts = val.toString().split(";");
-				//System.out.println("Got p msg for: "+parts[1]+" from "+parts[2]);
 				ppr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
 				tpr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
-				cpr.put(new Long(parts[2]), Float.parseFloat(parts[3]));
-				
 				indegree.put(new Long(parts[1]), 1.0f);
 				degree.put(new Long(parts[2]), Float.parseFloat(parts[4]));
 			} else {
@@ -100,73 +97,10 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				}
 			}
 		}
-		
-		//Code for BFS ordering
-		ArrayList<Long> start_nodes = new ArrayList<Long>();
-		for(String st : values1) {
-			if (st.charAt(0) == 'p') {
-				parts = st.toString().split(";");
-				if(info.get(new Long(parts[2])) == null) {
-					if(!start_nodes.contains(new Long(parts[1])))
-						start_nodes.add(new Long(parts[1]));					
-				}
-			}
-		}
-		/*System.out.println("Initial vertices:");
-		for(Long str1 : start_nodes) {
-			System.out.println(str1);
-		}*/
-		long prevlen = start_nodes.size() - 1;
-		ArrayList<Long> visited = new ArrayList<Long>();
-		ArrayList<Long> new_elems = new ArrayList<Long>();
-		while( prevlen != start_nodes.size() ) {
-			for(Long nd : start_nodes) {
-				if(!visited.contains(nd)) {
-					for(String st : values1) {
-						if(st.charAt(0) == 'p') {
-							parts = st.toString().split(";");
-							//System.out.println("Source: " + parts[2]);
-							if(nd.longValue() == new Long(parts[2]).longValue() && !start_nodes.contains(new Long(parts[1])) ) {
-								//System.out.println("adding...");
-								new_elems.add(new Long(parts[1]));
-							}
-						}
-					}
-					visited.add(nd);
-				}
-			}
-			prevlen = start_nodes.size();
-			for (Long e : new_elems) {
-				if(!start_nodes.contains(e))
-					start_nodes.add(e);
-			}
-		}
-		/*System.out.println("All vertices:");
-		for(Long str1 : start_nodes) {
-			System.out.println(str1);
-		}*/
-		ArrayList<String> values2 = new ArrayList<String>();
-		for(Long nd : start_nodes) {
-			for(String st : values1) {
-				if(st.charAt(0) == 'p') {
-					parts = st.toString().split(";");
-					if(nd.longValue() == new Long(parts[1]).longValue() && !values2.contains(st) ) {
-						values2.add(st);
-					}
-				}
-			}
-		}
-		/*System.out.println("Sorted p msgs:");
-		for(String str1 : values2) {
-			System.out.println(str1);
-		}*/
-		
-		//Page rank computation
 		float division = 0;
 		boolean first = true;
 		Enumeration<Long> enumKey;
 		int no_passes = 0;
-		long current_node = -1;
 		do {
 			if(!first) {
 				//System.out.println("Copying...");
@@ -185,37 +119,24 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 						cpr.put(keyv, 0.0f);
 				}
 			}
-			
-			//printTable(cpr);
-			
-			for(String val1 : values2) {
+			for(String val1 : values1) {
 				//System.out.println("Value: " + val1);
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
-					
-					if(current_node == -1) {
-						current_node = new Long(parts[1]).longValue();
-					} else if( new Long(parts[1]).longValue() != current_node ) {
-						float tmp = (float) ((0.15 / PageRank.nodes) + (0.85 * cpr.get(new Long(current_node))));
-				    	cpr.put(new Long(current_node), tmp);
-				    	
-				    	current_node = new Long(parts[1]).longValue();
+					if(cpr.get(new Long(parts[2])) != null && cpr.get(new Long(parts[2])).floatValue() != 0.0f) {
+						float ty = (float) ((0.15 / PageRank.nodes) + (0.85 * cpr.get(new Long(parts[2]))));
+						division = ty / degree.get(new Long(parts[2]));
+					} else {
+						division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
 					}
-					//System.out.println(parts[2]);
-					division = cpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
-					
 					//System.out.println("Division: "+division);
-					cpr.put(new Long(parts[1]), cpr.get(new Long(parts[1])) + division);
+					
+					cpr.put(new Long( parts[1] ), cpr.get(new Long(parts[1])) + division);
+					
 					//System.out.println("Put: "+cpr.get(new Long(parts[1])));
 				}
 			}
-			
-			if(cpr.get(new Long(current_node)) != null) {
-				float tmp = (float) ((0.15 / PageRank.nodes) + (0.85 * cpr.get(new Long(current_node))));
-				cpr.put(new Long(current_node), tmp);
-			}
-	    	
-			/*enumKey = cpr.keys();
+			enumKey = cpr.keys();
 			while(enumKey.hasMoreElements()) {
 			    Long keyv = enumKey.nextElement();
 			    //System.out.println(keyv+" "+cpr.get(keyv)+" "+(0.85 * cpr.get(keyv))+" "+(0.15 / PageRank.nodes)+" "+PageRank.nodes);
@@ -226,7 +147,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			    	cpr.put(keyv, tmp);
 			    	//System.out.println("Get: " + cpr.get(keyv));
 			    }
-			}*/
+			}
 			first = false;
 			no_passes++;
 			//System.out.println("tpr");
@@ -239,17 +160,15 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		float residual = 0;
 		float val;
 		while(enumKey.hasMoreElements()) {
-			Long keyv = enumKey.nextElement();
-			if(info.get(keyv) != null) {
-				val = Math.abs(cpr.get(keyv) - ppr.get(keyv));
-				val /= cpr.get(keyv);
-				residual += val;
-				//System.out.println(key+" "+keyv);
-				if(degree.get(keyv) != 0.0)
-					context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue() + " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1)) ) );
-				else
-					context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()) );
-			}
+		    Long keyv = enumKey.nextElement();
+		    val = Math.abs(cpr.get(keyv) - ppr.get(keyv));
+		    val /= cpr.get(keyv);
+		    residual += val;
+		    //System.out.println(key+" "+keyv);
+		    if(degree.get(keyv) != 0.0)
+		    	context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue() + " " + info.get(keyv).substring((info.get(keyv).indexOf(" ")+1)) ) );
+		    else
+		    	context.write(key, new Text(keyv+" "+cpr.get(keyv)+" "+degree.get(keyv).intValue()) );
 		}
 		//residual = (float) Math.round(residual * 10000) / 10000;
 		residual *= PageRank.multiplication_factor; //To map residual to the long rank
