@@ -5,7 +5,7 @@ public class CreateInputFile {
 		return ( ((x >= rejectMin) && (x < rejectLimit)) ? false : true );
 	}
 	public static void main(String[] args) {
-		double fromNetID = 0.82;
+		double fromNetID = 0.95;
 		double rejectMin = 0.99 * fromNetID;
 		double rejectLimit = rejectMin + 0.01;
 		
@@ -13,7 +13,7 @@ public class CreateInputFile {
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader("edges.txt"));
-			BufferedWriter bw = new BufferedWriter(new FileWriter("edges2.txt"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter("edges1.txt"));
 			
 			double counter = 1;
 			String line = "";
@@ -22,6 +22,7 @@ public class CreateInputFile {
 			while((line = br.readLine())!=null) {
 				
 				counter = Double.parseDouble(line.substring(line.lastIndexOf(" ")));
+				//System.out.print(counter);
 				if(selectInputLine(counter, rejectMin, rejectLimit)) {
 					line = line.substring(0,line.lastIndexOf(" "));
 					lno = line.substring(0,6);

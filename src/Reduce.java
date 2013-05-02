@@ -120,7 +120,6 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 		ArrayList<Long> visited = new ArrayList<Long>();
 		ArrayList<Long> new_elems = new ArrayList<Long>();
 		while( prevlen != start_nodes.size() ) {
-			System.out.println("1");
 			for(Long nd : start_nodes) {
 				if(!visited.contains(nd)) {
 					for(String st : values1) {
