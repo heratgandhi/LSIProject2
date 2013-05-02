@@ -123,8 +123,12 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 				//System.out.println("Value: " + val1);
 				if(val1.charAt(0) == 'p') {
 					parts = val1.toString().split(";");
-					division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
-					
+					if(cpr.get(new Long(parts[2])) != null && cpr.get(new Long(parts[2])).floatValue() != 0.0f) {
+						float ty = (float) ((0.15 / PageRank.nodes) + (0.85 * cpr.get(new Long(parts[2]))));
+						division = ty / degree.get(new Long(parts[2]));
+					} else {
+						division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
+					}
 					//System.out.println("Division: "+division);
 					
 					cpr.put(new Long( parts[1] ), cpr.get(new Long(parts[1])) + division);
