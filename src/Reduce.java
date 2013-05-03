@@ -129,7 +129,10 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
 			}
 			for(String val1 : values1) {
 				parts = val1.toString().split(";");
-				division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
+				if(cpr.get(new Long(parts[2]))!= null && cpr.get(new Long(parts[2])) != 0.0)
+					division = cpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
+				else
+					division = tpr.get(new Long(parts[2])) / degree.get(new Long(parts[2]));
 				cpr.put(new Long(parts[1]), cpr.get(new Long(parts[1])) + division);
 			}
 			enumKey = cpr.keys();
