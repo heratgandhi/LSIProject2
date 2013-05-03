@@ -90,11 +90,11 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 		blocklimits[67] = 685230;
 		
 		/*long[] blocklimits = new long[5];
-		blocklimits[0] = 2;
-		blocklimits[1] = 3;
-		blocklimits[2] = 4;
-		blocklimits[3] = 5;
-		blocklimits[4] = 6;*/
+		blocklimits[0] = 1;
+		blocklimits[1] = 2;
+		blocklimits[2] = 3;
+		blocklimits[3] = 4;
+		blocklimits[4] = 5;*/
 		
 		String[] parts1 = line.split("\t");
 		String source_b = parts1[0];
@@ -112,11 +112,8 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
 				} else {
 					list_v += " " + parts[3+i];
 				}
-				//System.out.println(blockNo(Long.parseLong(parts[3+i]), blocklimits));
-				//System.out.println(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+"")+" " + new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division))
-				context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));//division));
+				context.write(new Text(blockNo(Long.parseLong(parts[3+i]), blocklimits)+""), new Text("p;"+parts[3+i]+";"+source+";"+rank+";"+deg));
 			}
-			//System.out.println(new Text(source_b)+" "+new Text("i;"+source+";"+list_v));
 			context.write(new Text(source_b), new Text("i;"+source+";"+list_v));
 		} else {
 			context.write(new Text(source_b), new Text("i;"+source+"; "+rank+" 0"));

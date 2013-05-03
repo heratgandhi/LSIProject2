@@ -17,7 +17,7 @@ public class PageRank {
 	public static String bucket = "s3n://wordcount-test-herat/pass";
 	public static void main(String[] args) throws Exception {
 		int pass = 0;
-		float residue = 1000;
+		double residue = 1000;
 		
 		bucket = args[0];
 		
@@ -52,11 +52,11 @@ public class PageRank {
 			job.waitForCompletion(true);
 
 			residue = job.getCounters().findCounter(Reduce.ResidualCounter.RESIDUE).getValue();
-			residue = (residue/(float)nodes)/multiplication_factor;
-			residue = (float) Math.round(residue * 10000) / 10000;
+			residue = (residue/(double)nodes)/multiplication_factor;
+			//residue = (float) Math.round(residue * 10000) / 10000;
 			
 			System.out.println("Residual value is for pass " + pass + ": "+ residue);
-			System.out.println("Average no. of passes: "+ job.getCounters().findCounter(Reduce.ResidualCounter.PASSES).getValue()/68f);
+			System.out.println("Average no. of iterations: "+ job.getCounters().findCounter(Reduce.ResidualCounter.PASSES).getValue()/68.0);
 		}
 	}
 }

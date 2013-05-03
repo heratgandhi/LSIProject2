@@ -26,7 +26,7 @@ public class OutDegree {
 			br.close();
 			bw.close();
 		} catch(Exception e) {
-			
+			e.printStackTrace();
 		}
 	}
 }

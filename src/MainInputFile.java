@@ -5,12 +5,13 @@ public class MainInputFile {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader("edges1.txt"));
 			BufferedReader br1 = new BufferedReader(new FileReader("blocks.txt"));
-			//BufferedWriter bw = new BufferedWriter(new FileWriter("blocked_input"));
-			BufferedWriter bw = new BufferedWriter(new FileWriter("input"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter("blockedinput"));
+			//BufferedWriter bw = new BufferedWriter(new FileWriter("input"));
 			
 			String line = "";
 			long counter = 0;
 			long node = 0;
+			
 			String[] parts;
 			String dest = "";
 			long s,d;
@@ -26,18 +27,22 @@ public class MainInputFile {
 						dest += d;
 					counter ++;
 				} else {
+					while(s!=node+1) {
+						node++;
+						bw.write(currentBlockLimit+"\t"+ node +" " + (1/(double)PageRank.nodes) +" 0\n");
+					}
 					//bw.write(currentBlock+"\t"+ node + " " + (1/(double)PageRank.nodes) +" "+counter+" "+dest+"\n");
-					bw.write(node+"\t"+ (1/(double)PageRank.nodes) +" "+counter+" "+dest+"\n");
+					bw.write(currentBlockLimit+"\t"+s+" "+ (1/(double)PageRank.nodes) +" "+counter+" "+dest+"\n");
 					dest = d+"";
-					node++;
+					node = s;
 					if(node == currentBlockLimit) {
 						currentBlockLimit = Long.parseLong(br1.readLine().trim());
 					}
 					counter = 1;
 				}
 			}
-			//bw.write(currentBlock+"\t"+ node + " " +(1/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
-			bw.write(node+"\t"+ (1/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
+			bw.write(currentBlockLimit+"\t"+ node + " " +(1/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
+			//bw.write(node+"\t"+ (1/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
 			br.close();
 			br1.close();
 			bw.close();
