@@ -26,7 +26,7 @@ public class CorrectMainInputFile {
 						dest += d;
 					counter ++;
 				} else {
-					bw.write(currentBlock+"\t"+ node + " " + (1/(double)PageRank.nodes) +" "+counter+" "+dest+"\n");
+					bw.write(currentBlock+"\t"+ node + " " + (0.15/(double)PageRank.nodes) +" "+counter+" "+dest+"\n");
 					while(s != node+1) {
 						node++;
 						if(node >= currentBlockLimit) {
@@ -35,7 +35,7 @@ public class CorrectMainInputFile {
 							//System.out.println(currentBlock);
 						}
 						System.out.println(node);
-						bw.write(currentBlock+"\t"+ node +" " + (1/(double)PageRank.nodes) +" 0\n");
+						bw.write(currentBlock+"\t"+ node +" " + (0.15/(double)PageRank.nodes) +" 0\n");
 					}					
 					dest = d+"";
 					node = s;
@@ -47,7 +47,7 @@ public class CorrectMainInputFile {
 					counter = 1;
 				}
 			}
-			bw.write(currentBlock+"\t"+ node + " " +(1/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
+			bw.write(currentBlock+"\t"+ node + " " +(0.15/(double)PageRank.nodes)+" "+counter+" "+dest+"\n");
 			br.close();
 			br1.close();
 			bw.close();
